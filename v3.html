@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RugArena V3</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#050507;
+  color:white;
+  font-family:Arial,Helvetica,sans-serif;
+}
+.hero{
+  min-height:100vh;
+  padding:28px 22px;
+  background:
+    linear-gradient(rgba(0,0,0,.25),rgba(0,0,0,.92)),
+    radial-gradient(circle at 25% 18%,#ff2f5f77,transparent 34%),
+    radial-gradient(circle at 78% 12%,#6c2cff66,transparent 30%),
+    linear-gradient(135deg,#190d14,#050507);
+}
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:78px;
+}
+.logo{
+  font-size:24px;
+  font-weight:900;
+  letter-spacing:1px;
+  color:#ff3b6b;
+}
+.pill{
+  border:1px solid #ffffff44;
+  padding:10px 16px;
+  border-radius:999px;
+  font-size:14px;
+  color:#eee;
+}
+h1{
+  font-size:57px;
+  line-height:.95;
+  margin:0 0 20px;
+}
+.grad{color:#ff3b6b}
+.subtitle{
+  font-size:20px;
+  line-height:1.45;
+  color:#d7d7d7;
+  margin-bottom:32px;
+}
+.buttons{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+}
+button{
+  border:none;
+  border-radius:18px;
+  padding:15px 22px;
+  font-size:17px;
+  font-weight:800;
+}
+.primary{background:white;color:black}
+.secondary{background:transparent;color:white;border:1px solid #ffffff88}
+.section{
+  padding:34px 18px;
+  max-width:950px;
+  margin:auto;
+}
+.card{
+  background:#101014;
+  border:1px solid #2f2f38;
+  border-radius:26px;
+  padding:22px;
+  margin:20px 0;
+  box-shadow:0 0 35px #ff2f5f22;
+}
+.battle-title{
+  font-size:34px;
+  text-align:center;
+  margin-bottom:20px;
+}
+.row{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+.box{
+  background:#181820;
+  border:1px solid #33333d;
+  border-radius:18px;
+  padding:15px;
+  min-width:120px;
+  text-align:center;
+}
+.moon{background:#00ff88;color:black}
+.dead{background:#ff2f5f;color:white}
+input{
+  width:100%;
+  padding:16px;
+  margin:8px 0;
+  border-radius:16px;
+  border:none;
+  font-size:16px;
+}
+.result{
+  text-align:center;
+  color:#00ff88;
+  font-size:26px;
+  font-weight:900;
+  margin-top:18px;
+}
+.ai{
+  color:#aaa;
+  font-style:italic;
+  text-align:center;
+  margin-top:18px;
+}
+.feed{
+  font-family:monospace;
+  color:#00ff88;
+  background:#020203;
+  border-radius:18px;
+  padding:18px;
+  line-height:1.8;
+}
+.livebattle{
+  background:#14141b;
+  border:1px solid #353542;
+  border-radius:20px;
+  padding:16px;
+  margin:14px 0;
+}
+.livebattle h3{margin:0 0 12px;font-size:23px}
+.bar{
+  height:16px;
+  background:#2a2a32;
+  border-radius:999px;
+  overflow:hidden;
+  margin:10px 0;
+}
+.fill{
+  height:100%;
+  background:linear-gradient(90deg,#00ff88,#ff2f5f);
+}
+.verdict{
+  color:#bdbdbd;
+  font-style:italic;
+  margin-top:8px;
+}
+a{color:#00ff88}
+@media(max-width:600px){
+  h1{font-size:46px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="hero">
+  <div class="topbar">
+    <div class="logo">RugArena</div>
+    <div class="pill">LIVE DEGEN TERMINAL</div>
+  </div>
+
+  <h1>Most tokens die.<br><span class="grad">Some enter the arena.</span></h1>
+
+  <div class="subtitle">
+    A live crypto battle arena where communities vote, roast, compare, and judge tokens with real-time market data.
+  </div>
+
+  <div class="buttons">
+    <button class="primary" onclick="document.getElementById('arena').scrollIntoView({behavior:'smooth'})">Enter Arena</button>
+    <button class="secondary" onclick="document.getElementById('trending').scrollIntoView({behavior:'smooth'})">Live Battles</button>
+  </div>
+</div>
+
+<div class="section" id="trending">
+  <div class="card">
+    <h2>🔥 Trending Live Battles</h2>
+
+    <div class="livebattle">
+      <h3>PEPE ⚔️ DOGE</h3>
+      <div>Moon 61% / Dead 39%</div>
+      <div class="bar"><div class="fill" style="width:61%"></div></div>
+      <div class="verdict">AI Verdict: Meme strength high. Liquidity confidence medium.</div>
+    </div>
+
+    <div class="livebattle">
+      <h3>SENTINEL ⚔️ FARTCOIN</h3>
+      <div>Moon 44% / Dead 56%</div>
+      <div class="bar"><div class="fill" style="width:44%"></div></div>
+      <div class="verdict">AI Verdict: Tech narrative strong. Market attention weak.</div>
+    </div>
+
+    <div class="livebattle">
+      <h3>BONK ⚔️ WIF</h3>
+      <div>Moon 52% / Dead 48%</div>
+      <div class="bar"><div class="fill" style="width:52%"></div></div>
+      <div class="verdict">AI Verdict: Dog war detected. Degens emotionally unstable.</div>
+    </div>
+  </div>
+</div>
+
+<div class="section" id="arena">
+
+  <div class="card">
+    <div class="battle-title" id="battleTitle">PEPE ⚔️ DOGE</div>
+
+    <div class="row">
+      <div class="box">🚀 Moon<br><span id="moonCount">0</span></div>
+      <div class="box">💀 Dead<br><span id="deadCount">0</span></div>
+      <div class="box">Total<br><span id="totalVotes">0</span></div>
+    </div>
+
+    <p style="text-align:center" id="percentText">Moon 0% / Dead 0%</p>
+
+    <div class="row">
+      <button class="moon" onclick="voteMoon()">🚀 MOON</button>
+      <button class="dead" onclick="voteDead()">💀 DEAD</button>
+    </div>
+
+    <div class="result" id="resultText">Waiting for votes...</div>
+    <div class="ai" id="aiText">“AI detected maximum degen activity.”</div>
+  </div>
+
+  <div class="card">
+    <h2>Create Battle</h2>
+    <input id="coinA" placeholder="First coin e.g. SENTINEL">
+    <input id="coinB" placeholder="Second coin e.g. FARTCOIN">
+    <button onclick="createBattle()">⚔️ Start Battle</button>
+  </div>
+
+</div>
+
+<div class="section">
+
+  <div class="card">
+    <h2>Live Token Data</h2>
+    <input id="searchCoin" placeholder="Token name or contract address">
+    <button onclick="fetchDex()">🔎 Fetch DexScreener Data</button>
+    <div id="dexData" style="margin-top:18px;color:#ddd;line-height:1.7">No token loaded.</div>
+  </div>
+
+  <div class="card">
+    <h2>🔥 Hot Search</h2>
+    <div class="row">
+      <button onclick="loadHot('solana')">Solana</button>
+      <button onclick="loadHot('pump')">Pump</button>
+      <button onclick="loadHot('ai')">AI</button>
+      <button onclick="loadHot('meme')">Meme</button>
+    </div>
+    <div id="hotTokens" style="margin-top:20px;color:#ddd;line-height:1.7">Press a button to load live pairs.</div>
+  </div>
+
+  <div class="card">
+    <h2>AI Roast</h2>
+    <p id="roast">Waiting for degen activity...</p>
+    <button onclick="generateRoast()">🔥 Generate Roast</button>
+  </div>
+
+  <div class="card">
+    <h2>Live Arena Feed</h2>
+    <div class="feed" id="feed">
+      > scanning liquidity...<br>
+      > detecting degen behaviour...<br>
+      > waiting for next battle...
+    </div>
+  </div>
+
+  <div class="card">
+    <h2>Share</h2>
+    <button onclick="shareX()">Share on X</button>
+  </div>
+
+</div>
+
+<script>
+let moon = 0;
+let dead = 0;
+let currentBattle = "PEPE ⚔️ DOGE";
+
+function updateStats(){
+  let total = moon + dead;
+  let moonPercent = total === 0 ? 0 : Math.round((moon / total) * 100);
+  let deadPercent = total === 0 ? 0 : 100 - moonPercent;
+
+  document.getElementById("moonCount").innerText = moon;
+  document.getElementById("deadCount").innerText = dead;
+  document.getElementById("totalVotes").innerText = total;
+  document.getElementById("percentText").innerText = "Moon " + moonPercent + "% / Dead " + deadPercent + "%";
+
+  if(total === 0){
+    document.getElementById("resultText").innerText = "Waiting for votes...";
+  } else if(moon > dead){
+    document.getElementById("resultText").innerText = "🚀 MOON is winning";
+  } else if(dead > moon){
+    document.getElementById("resultText").innerText = "💀 DEAD is winning";
+  } else {
+    document.getElementById("resultText").innerText = "⚔️ Arena is tied";
+  }
+}
+
+function voteMoon(){
+  moon++;
+  updateStats();
+  document.getElementById("aiText").innerText = "“Cult energy detected. This token may survive another day.”";
+}
+
+function voteDead(){
+  dead++;
+  updateStats();
+  document.getElementById("aiText").innerText = "“Exit liquidity smell is getting stronger.”";
+}
+
+function createBattle(){
+  let a = document.getElementById("coinA").value || "UNKNOWN";
+  let b = document.getElementById("coinB").value || "UNKNOWN";
+
+  currentBattle = a.toUpperCase() + " ⚔️ " + b.toUpperCase();
+  document.getElementById("battleTitle").innerText = currentBattle;
+
+  moon = 0;
+  dead = 0;
+  updateStats();
+
+  document.getElementById("feed").innerHTML =
+  "> new battle created: " + currentBattle + "<br>" +
+  "> degen crowd entering arena...<br>" +
+  "> AI judgement pending...";
+}
+
+async function fetchDex(){
+  let q = document.getElementById("searchCoin").value.trim();
+  let box = document.getElementById("dexData");
+
+  if(!q){ alert("Enter token name or contract address"); return; }
+
+  box.innerHTML = "Loading live data...";
+
+  try{
+    let url = "https://api.dexscreener.com/latest/dex/search?q=" + encodeURIComponent(q);
+    let res = await fetch(url);
+    let data = await res.json();
+
+    if(!data.pairs || data.pairs.length === 0){
+      box.innerHTML = "No token found.";
+      return;
+    }
+
+    let p = data.pairs[0];
+    box.innerHTML = makePairHtml(p);
+
+  }catch(e){
+    box.innerHTML = "API error.";
+  }
+}
+
+async function loadHot(query){
+  let box = document.getElementById("hotTokens");
+  box.innerHTML = "Loading live pairs...";
+
+  try{
+    let url = "https://api.dexscreener.com/latest/dex/search?q=" + encodeURIComponent(query);
+    let res = await fetch(url);
+    let data = await res.json();
+
+    if(!data.pairs || data.pairs.length === 0){
+      box.innerHTML = "No pairs found.";
+      return;
+    }
+
+    let html = "";
+    data.pairs.slice(0,6).forEach(function(p){
+      html += makePairHtml(p);
+    });
+
+    box.innerHTML = html;
+
+  }catch(e){
+    box.innerHTML = "API error.";
+  }
+}
+
+function makePairHtml(p){
+  let price = p.priceUsd || "N/A";
+  let fdv = p.fdv ? "$" + Number(p.fdv).toLocaleString() : "N/A";
+  let liq = p.liquidity && p.liquidity.usd ? "$" + Number(p.liquidity.usd).toLocaleString() : "N/A";
+  let vol = p.volume && p.volume.h24 ? "$" + Number(p.volume.h24).toLocaleString() : "N/A";
+  let change = p.priceChange && p.priceChange.h24 ? p.priceChange.h24 + "%" : "N/A";
+
+  return "<div style='border-bottom:1px solid #333;padding:14px 0'>" +
+  "<b>" + (p.baseToken?.symbol || "UNKNOWN") + " / " + (p.quoteToken?.symbol || "") + "</b><br>" +
+  "Chain: " + p.chainId + " | DEX: " + p.dexId + "<br>" +
+  "Price: $" + price + "<br>" +
+  "FDV: " + fdv + " | Liquidity: " + liq + "<br>" +
+  "24h Vol: " + vol + " | 24h: " + change + "<br>" +
+  "<a href='" + p.url + "' target='_blank'>Open chart</a>" +
+  "</div>";
+}
+
+function generateRoast(){
+  let roasts = [
+    "Professional exit liquidity detected.",
+    "This chart needs therapy.",
+    "Dev wallet is breathing heavily.",
+    "Community strong. Liquidity weak.",
+    "AI is confused. Degens are not.",
+    "The candles look like a crime scene.",
+    "Liquidity is thinner than the dev’s roadmap.",
+    "Chart says moon. Wallet says funeral."
+  ];
+
+  document.getElementById("roast").innerText = roasts[Math.floor(Math.random()*roasts.length)];
+}
+
+function shareX(){
+  let text = encodeURIComponent("I just entered RugArena: " + currentBattle + " — Moon or Dead? 🚀💀");
+  window.open("https://twitter.com/intent/tweet?text=" + text, "_blank");
+}
+
+updateStats();
+</script>
+
+</body>
+</html>
