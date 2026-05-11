@@ -1,97 +1,111 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>RugArena</title>
-
-  <style>
-    body{
-      margin:0;
-      background:#090909;
-      color:white;
-      font-family:Arial, sans-serif;
-      text-align:center;
-    }
-
-    .container{
-      padding:40px 20px;
-    }
-
-    h1{
-      font-size:55px;
-      color:#ff004c;
-    }
-
-    .battle{
-      margin-top:50px;
-      background:#141414;
-      border:2px solid #ff004c;
-      border-radius:20px;
-      padding:30px;
-      max-width:500px;
-      margin-left:auto;
-      margin-right:auto;
-    }
-
-    .coins{
-      font-size:35px;
-      margin-bottom:30px;
-    }
-
-    button{
-      padding:15px 35px;
-      font-size:22px;
-      border:none;
-      border-radius:12px;
-      margin:10px;
-      cursor:pointer;
-      font-weight:bold;
-    }
-
-    .moon{
-      background:#00ff88;
-      color:black;
-    }
-
-    .dead{
-      background:#ff004c;
-      color:white;
-    }
-
-    .ai{
-      margin-top:30px;
-      color:#aaaaaa;
-      font-style:italic;
-    }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RugArena</title>
+<style>
+body{margin:0;background:#070707;color:white;font-family:Arial;text-align:center}
+.container{padding:35px 18px}
+h1{font-size:52px;color:#ff2f5f;margin-bottom:5px}
+.tag{color:#ccc;font-size:20px}
+.battle{margin:35px auto;background:#111;border:2px solid #ff2f5f;border-radius:22px;padding:25px;max-width:520px}
+.coins{font-size:34px;margin-bottom:20px}
+.votes{display:flex;justify-content:center;gap:20px;margin:20px 0;font-size:18px}
+button{padding:15px 32px;font-size:22px;border:none;border-radius:14px;margin:8px;font-weight:bold}
+.moon{background:#64ff88;color:#000}
+.dead{background:#ff2f5f;color:white}
+.ai{margin-top:25px;color:#aaa;font-style:italic}
+.card{background:#151515;border:1px solid #333;border-radius:16px;padding:18px;margin:18px auto;max-width:520px}
+input{padding:14px;width:80%;border-radius:12px;border:none;margin:8px;font-size:16px}
+.share{background:#1d9bf0;color:white}
+.small{color:#888;font-size:14px}
+</style>
 </head>
-
 <body>
-
 <div class="container">
-
 <h1>RugArena</h1>
-
-<p>Vote. Roast. Survive.</p>
+<div class="tag">Vote. Roast. Survive.</div>
 
 <div class="battle">
+<div class="coins" id="battleTitle">SENTINEL ⚔️ FARTCOIN</div>
 
-<div class="coins">
-SENTINEL ⚔️ FARTCOIN
+<div class="votes">
+<div>🚀 Moon: <span id="moonCount">0</span></div>
+<div>💀 Dead: <span id="deadCount">0</span></div>
 </div>
 
-<button class="moon">🚀 MOON</button>
+<button class="moon" onclick="voteMoon()">🚀 MOON</button>
+<button class="dead" onclick="voteDead()">💀 DEAD</button>
 
-<button class="dead">💀 DEAD</button>
-
-<div class="ai">
-“AI detected maximum degen activity.”
+<div class="ai" id="aiText">“AI detected maximum degen activity.”</div>
 </div>
 
+<div class="card">
+<h2>Create Battle</h2>
+<input id="coinA" placeholder="First coin e.g. SENTINEL">
+<input id="coinB" placeholder="Second coin e.g. FARTCOIN">
+<br>
+<button onclick="createBattle()">⚔️ Start Battle</button>
 </div>
 
+<div class="card">
+<h2>AI Roast</h2>
+<p id="roast">Waiting for degen activity...</p>
+<button onclick="generateRoast()">🔥 Generate Roast</button>
 </div>
 
+<div class="card">
+<h2>Share</h2>
+<button class="share" onclick="shareX()">Share on X</button>
+<p class="small">RugArena is an experimental crypto battle arena.</p>
+</div>
+</div>
+
+<script>
+let moon = 0;
+let dead = 0;
+let currentBattle = "SENTINEL ⚔️ FARTCOIN";
+
+function voteMoon(){
+moon++;
+document.getElementById("moonCount").innerText = moon;
+document.getElementById("aiText").innerText = "“AI says: cult energy detected. This may survive another day.”";
+}
+
+function voteDead(){
+dead++;
+document.getElementById("deadCount").innerText = dead;
+document.getElementById("aiText").innerText = "“AI says: exit liquidity smell is getting stronger.”";
+}
+
+function createBattle(){
+let a = document.getElementById("coinA").value || "UNKNOWN";
+let b = document.getElementById("coinB").value || "UNKNOWN";
+currentBattle = a.toUpperCase() + " ⚔️ " + b.toUpperCase();
+document.getElementById("battleTitle").innerText = currentBattle;
+moon = 0; dead = 0;
+document.getElementById("moonCount").innerText = 0;
+document.getElementById("deadCount").innerText = 0;
+document.getElementById("aiText").innerText = "“New battle loaded. Degens are entering the arena.”";
+}
+
+function generateRoast(){
+let roasts = [
+"Professional exit liquidity detected.",
+"This chart needs therapy.",
+"Dev wallet is breathing heavily.",
+"Community strong. Liquidity weak.",
+"AI is confused. Degens are not.",
+"Moon chance: depends on how loud CT gets."
+];
+document.getElementById("roast").innerText = roasts[Math.floor(Math.random()*roasts.length)];
+}
+
+function shareX(){
+let text = encodeURIComponent("I just voted on " + currentBattle + " at RugArena. Moon or Dead?");
+window.open("https://twitter.com/intent/tweet?text=" + text, "_blank");
+}
+</script>
 </body>
 </html>
