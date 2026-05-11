@@ -5,39 +5,48 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>RugArena</title>
 <style>
-body{margin:0;background:#070707;color:white;font-family:Arial;text-align:center}
-.container{padding:35px 18px}
-h1{font-size:52px;color:#ff2f5f;margin-bottom:5px}
-.tag{color:#ccc;font-size:20px}
-.battle{margin:35px auto;background:#111;border:2px solid #ff2f5f;border-radius:22px;padding:25px;max-width:520px}
-.coins{font-size:34px;margin-bottom:20px}
-.votes{display:flex;justify-content:center;gap:20px;margin:20px 0;font-size:18px}
-button{padding:15px 32px;font-size:22px;border:none;border-radius:14px;margin:8px;font-weight:bold}
-.moon{background:#64ff88;color:#000}
+body{margin:0;background:#050505;color:white;font-family:Arial;text-align:center}
+.container{padding:25px 14px}
+h1{font-size:52px;color:#ff2f5f;margin:8px 0}
+.card,.battle{background:#111;border:1px solid #333;border-radius:20px;padding:18px;margin:16px auto;max-width:650px}
+.battle{border:2px solid #ff2f5f}
+input{padding:14px;width:82%;border-radius:12px;border:none;margin:7px;font-size:15px}
+button{padding:13px 22px;font-size:18px;border:none;border-radius:13px;margin:7px;font-weight:bold}
+.moon{background:#00ff88;color:#000}
 .dead{background:#ff2f5f;color:white}
-.ai{margin-top:25px;color:#aaa;font-style:italic}
-.card{background:#151515;border:1px solid #333;border-radius:16px;padding:18px;margin:18px auto;max-width:520px}
-input{padding:14px;width:80%;border-radius:12px;border:none;margin:8px;font-size:16px}
-.share{background:#1d9bf0;color:white}
-.small{color:#888;font-size:14px}
+.blue{background:#1d9bf0;color:white}
+.gray{background:#333;color:white}
+.box{background:#181818;border:1px solid #333;border-radius:14px;padding:12px;margin:8px}
+.row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.result{font-size:24px;font-weight:bold;color:#00ff88;margin-top:15px}
+.ai{color:#aaa;font-style:italic;margin-top:14px}
+.small{color:#aaa;font-size:14px}
+.history{text-align:left;color:#ddd;line-height:1.7}
+a{color:#00ff88}
 </style>
 </head>
+
 <body>
 <div class="container">
+
 <h1>RugArena</h1>
-<div class="tag">Vote. Roast. Survive.</div>
+<p>Vote. Roast. Survive.</p>
 
 <div class="battle">
-<div class="coins" id="battleTitle">SENTINEL ⚔️ FARTCOIN</div>
+<h2 id="battleTitle">SENTINEL ⚔️ FARTCOIN</h2>
 
-<div class="votes">
-<div>🚀 Moon: <span id="moonCount">0</span></div>
-<div>💀 Dead: <span id="deadCount">0</span></div>
+<div class="row">
+<div class="box">🚀 Moon<br><span id="moonCount">0</span></div>
+<div class="box">💀 Dead<br><span id="deadCount">0</span></div>
+<div class="box">Total<br><span id="totalVotes">0</span></div>
 </div>
+
+<p id="percentText">Moon 0% / Dead 0%</p>
 
 <button class="moon" onclick="voteMoon()">🚀 MOON</button>
 <button class="dead" onclick="voteDead()">💀 DEAD</button>
 
+<div class="result" id="resultText">Waiting for votes...</div>
 <div class="ai" id="aiText">“AI detected maximum degen activity.”</div>
 </div>
 
@@ -50,62 +59,177 @@ input{padding:14px;width:80%;border-radius:12px;border:none;margin:8px;font-size
 </div>
 
 <div class="card">
+<h2>Live Token Data</h2>
+<input id="searchCoin" placeholder="Token name or contract address">
+<br>
+<button class="gray" onclick="fetchDex()">🔎 Fetch DexScreener Data</button>
+<div id="dexData" class="history">No token loaded.</div>
+</div>
+
+<div class="card">
 <h2>AI Roast</h2>
 <p id="roast">Waiting for degen activity...</p>
 <button onclick="generateRoast()">🔥 Generate Roast</button>
 </div>
 
 <div class="card">
+<h2>Arena Score</h2>
+<div class="row">
+<div class="box">Risk<br><span id="risk">Unknown</span></div>
+<div class="box">Hype<br><span id="hype">Unknown</span></div>
+<div class="box">Degen<br><span id="degen">Unknown</span></div>
+</div>
+<button class="gray" onclick="generateScore()">⚡ Generate Score</button>
+</div>
+
+<div class="card">
+<h2>Battle History</h2>
+<div class="history" id="history">No battles yet.</div>
+</div>
+
+<div class="card">
 <h2>Share</h2>
-<button class="share" onclick="shareX()">Share on X</button>
+<button class="blue" onclick="shareX()">Share on X</button>
 <p class="small">RugArena is an experimental crypto battle arena.</p>
 </div>
+
 </div>
 
 <script>
 let moon = 0;
 let dead = 0;
 let currentBattle = "SENTINEL ⚔️ FARTCOIN";
+let historyList = [];
+
+function updateStats(){
+  let total = moon + dead;
+  let moonPercent = total === 0 ? 0 : Math.round((moon / total) * 100);
+  let deadPercent = total === 0 ? 0 : 100 - moonPercent;
+
+  document.getElementById("moonCount").innerText = moon;
+  document.getElementById("deadCount").innerText = dead;
+  document.getElementById("totalVotes").innerText = total;
+  document.getElementById("percentText").innerText = "Moon " + moonPercent + "% / Dead " + deadPercent + "%";
+
+  if(total === 0){
+    document.getElementById("resultText").innerText = "Waiting for votes...";
+  } else if(moon > dead){
+    document.getElementById("resultText").innerText = "🚀 MOON is winning";
+  } else if(dead > moon){
+    document.getElementById("resultText").innerText = "💀 DEAD is winning";
+  } else {
+    document.getElementById("resultText").innerText = "⚔️ Arena is tied";
+  }
+}
 
 function voteMoon(){
-moon++;
-document.getElementById("moonCount").innerText = moon;
-document.getElementById("aiText").innerText = "“AI says: cult energy detected. This may survive another day.”";
+  moon++;
+  updateStats();
+  document.getElementById("aiText").innerText = "“AI says: cult energy detected. This may survive another day.”";
 }
 
 function voteDead(){
-dead++;
-document.getElementById("deadCount").innerText = dead;
-document.getElementById("aiText").innerText = "“AI says: exit liquidity smell is getting stronger.”";
+  dead++;
+  updateStats();
+  document.getElementById("aiText").innerText = "“AI says: exit liquidity smell is getting stronger.”";
 }
 
 function createBattle(){
-let a = document.getElementById("coinA").value || "UNKNOWN";
-let b = document.getElementById("coinB").value || "UNKNOWN";
-currentBattle = a.toUpperCase() + " ⚔️ " + b.toUpperCase();
-document.getElementById("battleTitle").innerText = currentBattle;
-moon = 0; dead = 0;
-document.getElementById("moonCount").innerText = 0;
-document.getElementById("deadCount").innerText = 0;
-document.getElementById("aiText").innerText = "“New battle loaded. Degens are entering the arena.”";
+  let a = document.getElementById("coinA").value || "UNKNOWN";
+  let b = document.getElementById("coinB").value || "UNKNOWN";
+  currentBattle = a.toUpperCase() + " ⚔️ " + b.toUpperCase();
+
+  document.getElementById("battleTitle").innerText = currentBattle;
+  historyList.unshift("⚔️ " + currentBattle);
+  document.getElementById("history").innerHTML = historyList.join("<br>");
+
+  moon = 0;
+  dead = 0;
+  updateStats();
+
+  document.getElementById("aiText").innerText = "“New battle loaded. Degens are entering the arena.”";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+async function fetchDex(){
+  let q = document.getElementById("searchCoin").value.trim();
+  let box = document.getElementById("dexData");
+
+  if(!q){
+    alert("Enter token name or contract address");
+    return;
+  }
+
+  box.innerHTML = "Loading DexScreener data...";
+
+  try{
+    let url = "https://api.dexscreener.com/latest/dex/search?q=" + encodeURIComponent(q);
+    let res = await fetch(url);
+    let data = await res.json();
+
+    if(!data.pairs || data.pairs.length === 0){
+      box.innerHTML = "No token found.";
+      return;
+    }
+
+    let p = data.pairs[0];
+
+    let price = p.priceUsd || "N/A";
+    let fdv = p.fdv ? "$" + Number(p.fdv).toLocaleString() : "N/A";
+    let liq = p.liquidity && p.liquidity.usd ? "$" + Number(p.liquidity.usd).toLocaleString() : "N/A";
+    let vol = p.volume && p.volume.h24 ? "$" + Number(p.volume.h24).toLocaleString() : "N/A";
+    let change = p.priceChange && p.priceChange.h24 ? p.priceChange.h24 + "%" : "N/A";
+
+    box.innerHTML =
+      "<b>" + (p.baseToken?.symbol || "UNKNOWN") + " / " + (p.quoteToken?.symbol || "") + "</b><br>" +
+      "Chain: " + p.chainId + "<br>" +
+      "DEX: " + p.dexId + "<br>" +
+      "Price: $" + price + "<br>" +
+      "FDV / Market Cap: " + fdv + "<br>" +
+      "Liquidity: " + liq + "<br>" +
+      "24h Volume: " + vol + "<br>" +
+      "24h Change: " + change + "<br><br>" +
+      "<a href='" + p.url + "' target='_blank'>Open on DexScreener</a>";
+
+  }catch(e){
+    box.innerHTML = "API error. Try again later.";
+  }
 }
 
 function generateRoast(){
-let roasts = [
-"Professional exit liquidity detected.",
-"This chart needs therapy.",
-"Dev wallet is breathing heavily.",
-"Community strong. Liquidity weak.",
-"AI is confused. Degens are not.",
-"Moon chance: depends on how loud CT gets."
-];
-document.getElementById("roast").innerText = roasts[Math.floor(Math.random()*roasts.length)];
+  let roasts = [
+    "Professional exit liquidity detected.",
+    "This chart needs therapy.",
+    "Dev wallet is breathing heavily.",
+    "Community strong. Liquidity weak.",
+    "AI is confused. Degens are not.",
+    "Moon chance depends on how loud Crypto Twitter gets.",
+    "The candles look like a crime scene.",
+    "Holder count rising. Common sense falling.",
+    "Liquidity is thinner than the dev’s roadmap.",
+    "Chart says moon. Wallet says funeral."
+  ];
+
+  document.getElementById("roast").innerText = roasts[Math.floor(Math.random()*roasts.length)];
+}
+
+function generateScore(){
+  let risks = ["Low", "Medium", "High", "Extreme", "Degen Mode"];
+  let hypes = ["Dead", "Weak", "Building", "Hot", "Insane"];
+  let degens = ["Normal", "Risky", "Unhinged", "Full Ape", "No Survivors"];
+
+  document.getElementById("risk").innerText = risks[Math.floor(Math.random()*risks.length)];
+  document.getElementById("hype").innerText = hypes[Math.floor(Math.random()*hypes.length)];
+  document.getElementById("degen").innerText = degens[Math.floor(Math.random()*degens.length)];
 }
 
 function shareX(){
-let text = encodeURIComponent("I just voted on " + currentBattle + " at RugArena. Moon or Dead?");
-window.open("https://twitter.com/intent/tweet?text=" + text, "_blank");
+  let text = encodeURIComponent("I just voted on " + currentBattle + " at RugArena. Moon or Dead? 🚀💀");
+  window.open("https://twitter.com/intent/tweet?text=" + text, "_blank");
 }
+
+updateStats();
 </script>
+
 </body>
 </html>
