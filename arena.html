@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RugArena Live</title>
+<style>
+body{margin:0;background:#050505;color:white;font-family:Arial;text-align:center}
+.container{padding:22px 14px}
+h1{font-size:48px;color:#ff2f5f;margin:8px 0}
+.card,.battle{background:#111;border:1px solid #333;border-radius:20px;padding:18px;margin:16px auto;max-width:680px}
+.battle{border:2px solid #ff2f5f}
+input{padding:14px;width:82%;border-radius:12px;border:none;margin:7px;font-size:15px}
+button{padding:13px 22px;font-size:17px;border:none;border-radius:13px;margin:7px;font-weight:bold}
+.moon{background:#00ff88;color:#000}
+.dead{background:#ff2f5f;color:white}
+.gray{background:#333;color:white}
+.blue{background:#1d9bf0;color:white}
+.box{background:#181818;border:1px solid #333;border-radius:14px;padding:12px;margin:8px}
+.row{display:flex;justify-content:center;gap:10px;flex-wrap:wrap}
+.history{text-align:left;color:#ddd;line-height:1.7;font-size:14px}
+.result{font-size:23px;font-weight:bold;color:#00ff88;margin-top:15px}
+.ai{color:#aaa;font-style:italic;margin-top:14px}
+a{color:#00ff88}
+.small{color:#999;font-size:13px}
+.token{border-bottom:1px solid #333;padding:12px 0}
+</style>
+</head>
+
+<body>
+<div class="container">
+
+<h1>RugArena Live</h1>
+<p>Crypto battles. Live data. Degen judgement.</p>
+
+<div class="battle">
+<h2 id="battleTitle">PEPE ⚔️ DOGE</h2>
+
+<div class="row">
+<div class="box">🚀 Moon<br><span id="moonCount">0</span></div>
+<div class="box">💀 Dead<br><span id="deadCount">0</span></div>
+<div class="box">Total<br><span id="totalVotes">0</span></div>
+</div>
+
+<p id="percentText">Moon 0% / Dead 0%</p>
+
+<button class="moon" onclick="voteMoon()">🚀 MOON</button>
+<button class="dead" onclick="voteDead()">💀 DEAD</button>
+
+<div class="result" id="
