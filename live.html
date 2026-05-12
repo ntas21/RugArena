@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RugArena Live</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#020304;color:white;font-family:Arial,Helvetica,sans-serif}
+body:before{content:"";position:fixed;inset:0;background:linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),radial-gradient(circle at 70% 10%,#ff2f5f44,transparent 35%),radial-gradient(circle at 30% 30%,#00ff8844,transparent 30%);background-size:45px 45px,45px 45px,auto,auto;z-index:-1}
+.header{position:sticky;top:0;z-index:9;background:rgba(2,3,4,.88);backdrop-filter:blur(14px);display:flex;justify-content:space-between;align-items:center;padding:18px;border-bottom:1px solid #ffffff12}
+.brand{font-size:24px;font-weight:900}.live{border:1px solid #ffffff44;border-radius:999px;padding:9px 16px;letter-spacing:3px}
+.ticker{overflow:hidden;white-space:nowrap;background:#06130c;color:#00ff88;font-family:monospace;border-bottom:1px solid #00ff8833}
+.ticker span{display:inline-block;padding:10px 0;animation:move 25s linear infinite}
+@keyframes move{from{transform:translateX(100%)}to{transform:translateX(-100%)}}
+.hero{padding:55px 24px 35px}
+h1{font-size:50px;line-height:.95;margin:0 0 20px}.red{color:#ff2f5f}.green{color:#00ff88}
+.sub{font-size:19px;color:#c9c9c9;line-height:1.5}
+.section{max-width:920px;margin:auto;padding:20px}
+.card{background:rgba(13,15,18,.9);border:1px solid #ffffff18;border-radius:26px;padding:22px;margin:18px 0;box-shadow:0 0 35px #ff2f5f22}
+.battleTitle{text-align:center;font-size:34px;margin:10px 0 20px}
+.row{display:flex;gap:12px;flex-wrap:wrap;justify-content:center}
+.box{background:#ffffff08;border:1px solid #ffffff18;border-radius:18px;padding:15px;min-width:120px;text-align:center}
+button{border:none;border-radius:16px;padding:15px 22px;font-size:17px;font-weight:900;margin:6px}
+.moon{background:#00ff88;color:#000}.dead{background:#ff2f5f;color:#fff}.dark{background:#202126;color:white}
+.bar{height:18px;background:#2b2c31;border-radius:999px;overflow:hidden;margin:18px 0}
+.moonbar{height:100%;width:0%;background:linear-gradient(90deg,#00ff88,#ff2f5f);transition:width .5s ease}
+.result{text-align:center;font-size:26px;font-weight:900;color:#00ff88}
+.ai{text-align:center;color:#aaa;font-style:italic;margin-top:15px}
+input{width:100%;padding:16px;margin:8px 0;border-radius:15px;border:none;font-size:16px}
+.terminal{background:#000;color:#00ff88;font-family:monospace;border-radius:20px;padding:18px;line-height:1.8;max-height:220px;overflow:auto}
+.chart{width:100%;height:420px;border:0;border-radius:18px;background:#000}
+.token{border-bottom:1px solid #ffffff18;padding:14px 0;line-height:1.7;color:#ddd}
+a{color:#00ff88}
+@media(max-width:650px){h1{font-size:42px}.chart{height:360px}}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="brand">RugArena</div>
+  <div class="live">LIVE</div>
+</div>
+
+<div class="ticker"><span id="ticker">Loading live market ticker...</span></div>
+
+<div class="hero">
+  <h1>The arena where <span class="red">tokens fight</span><br>and <span class="green">degens decide.</span></h1>
+  <div class="sub">Live token data, animated votes, activity feed, DexScreener charts and AI degen judgement.</div>
+</div>
+
+<div class="section">
+
+<div class="card">
+  <div class="battleTitle" id="battleTitle">PEPE ⚔️ DOGE</div>
+
+  <div class="row">
+    <div class="box">🚀 Moon<br><span id="moonCount">0</span></div>
+    <div class="box">💀 Dead<br><span id="deadCount">0</span></div>
+    <div class="box">Total<br><span id="totalVotes">0</span></div>
+  </div>
+
+  <div class="bar"><div class="moonbar" id="moonBar"></div></div>
+  <p style="text-align:center" id="percentText">Moon 0% / Dead 0%</p>
+
+  <div class="row">
+    <button class="moon" onclick="voteMoon()">🚀 MOON</button>
+    <button class="dead" onclick="voteDead()">💀 DEAD</button>
+  </div>
+
+  <div class="result" id="resultText">Waiting for votes...</div>
+  <div class="ai" id="aiText">“AI detected maximum degen activity.”</div>
+</div>
+
+<div class="card">
+  <h2>Create Battle</h2>
+  <input id="coinA" placeholder="First coin e.g. SENTINEL">
+  <input id="coinB" placeholder="Second coin e.g. FARTCOIN">
+  <button class="dark" onclick="createBattle()">⚔️ Start Battle</button>
+</div>
+
+<div class="card">
+  <h2>Live Token Data + Chart</h2>
+  <input id="searchCoin" placeholder="Token name or contract address">
+  <button class="dark" onclick="fetchDex()">🔎 Fetch Live Data</button>
+  <div id="dexData">No token loaded.</div>
+  <br>
+  <iframe id="chartFrame" class="chart" style="display:none"></iframe>
+</div>
+
+<div class="card">
+  <h2>🔥 Hot Market Search</h2>
+  <div class="row">
+    <button onclick="loadHot('solana')">Solana</button>
+    <button onclick="loadHot('pump')">Pump</button>
+    <button onclick="loadHot('ai')">AI</button>
+    <button onclick="loadHot('meme')">Meme</button>
+  </div>
+  <div id="hotTokens">Press a button to load live pairs.</div>
+</div>
+
+<div class="card">
+  <h2>Live Activity Feed</h2>
+  <div class="terminal" id="feed">
+    > protocol booting...<br>
+    > liquidity scanner online...<br>
+    > waiting for wallet activity...
+  </div>
+</div>
+
+<div class="card">
+  <h2>AI Roast</h2>
+  <p id="roast">Waiting for degen activity...</p>
+  <button class="dark" onclick="generateRoast()">🔥 Generate Roast</button>
+</div>
+
+<div class="card">
+  <h2>Share</h2>
+  <button onclick="shareX()">Share on X</button>
+</div>
+
+</div>
+
+<script>
+let moon=0, dead=0, currentBattle="PEPE ⚔️ DOGE";
+
+function beep(type){
+  let ctx=new (window.AudioContext||window.webkitAudioContext)();
+  let o=ctx.createOscillator();
+  let g=ctx.createGain();
+  o.connect(g); g.connect(ctx.destination);
+  o.frequency.value=type==="moon"?720:120;
+  g.gain.value=.08;
+  o.start();
+  o.stop(ctx.currentTime+.13);
+}
+
+function updateStats(){
+  let total=moon+dead;
+  let mp=total===0?0:Math.round((moon/total)*100);
+  let dp=total===0?0:100-mp;
+
+  moonCount.innerText=moon;
+  deadCount.innerText=dead;
+  totalVotes.innerText=total;
+  percentText.innerText="Moon "+mp+"% / Dead "+dp+"%";
+  moonBar.style.width=mp+"%";
+
+  if(total===0) resultText.innerText="Waiting for votes...";
+  else if(moon>dead) resultText.innerText="🚀 MOON is winning";
+  else if(dead>moon) resultText.innerText="💀 DEAD is winning";
+  else resultText.innerText="⚔️ Arena is tied";
+}
+
+function addFeed(text){
+  feed.innerHTML="> "+text+"<br>"+feed.innerHTML;
+}
+
+function voteMoon(){
+  moon++; updateStats(); beep("moon");
+  aiText.innerText="“Cult energy detected. This token may survive another day.”";
+  addFeed("wallet voted MOON on "+currentBattle);
+}
+
+function voteDead(){
+  dead++; updateStats(); beep("dead");
+  aiText.innerText="“Exit liquidity smell is getting stronger.”";
+  addFeed("wallet voted DEAD on "+currentBattle);
+}
+
+function createBattle(){
+  let a=coinA.value||"UNKNOWN";
+  let b=coinB.value||"UNKNOWN";
+  currentBattle=a.toUpperCase()+" ⚔️ "+b.toUpperCase();
+  battleTitle.innerText=currentBattle;
+  moon=0; dead=0; updateStats();
+  addFeed("new battle detected: "+currentBattle);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+async function fetchDex(){
+  let q=searchCoin.value.trim();
+  if(!q){alert("Enter token name or contract address");return;}
+  dexData.innerHTML="Loading live data...";
+  addFeed("fetching DexScreener data for "+q);
+
+  try{
+    let res=await fetch("https://api.dexscreener.com/latest/dex/search?q="+encodeURIComponent(q));
+    let data=await res.json();
+    if(!data.pairs||data.pairs.length===0){dexData.innerHTML="No token found.";return;}
+    let p=data.pairs[0];
+    dexData.innerHTML=pairHtml(p);
+
+    chartFrame.style.display="block";
+    chartFrame.src=p.url+"?embed=1&theme=dark";
+
+    addFeed((p.baseToken?.symbol||"TOKEN")+" loaded | liquidity scanner active");
+  }catch(e){
+    dexData.innerHTML="API error.";
+  }
+}
+
+async function loadHot(q){
+  hotTokens.innerHTML="Loading live pairs...";
+  try{
+    let res=await fetch("https://api.dexscreener.com/latest/dex/search?q="+encodeURIComponent(q));
+    let data=await res.json();
+    if(!data.pairs){hotTokens.innerHTML="No pairs found.";return;}
+    hotTokens.innerHTML=data.pairs.slice(0,6).map(pairHtml).join("");
+    updateTicker(data.pairs.slice(0,6));
+    addFeed("hot market search loaded: "+q);
+  }catch(e){hotTokens.innerHTML="API error."}
+}
+
+function pairHtml(p){
+  let price=p.priceUsd||"N/A";
+  let fdv=p.fdv?"$"+Number(p.fdv).toLocaleString():"N/A";
+  let liq=p.liquidity?.usd?"$"+Number(p.liquidity.usd).toLocaleString():"N/A";
+  let vol=p.volume?.h24?"$"+Number(p.volume.h24).toLocaleString():"N/A";
+  let ch=p.priceChange?.h24?p.priceChange.h24+"%":"N/A";
+  return "<div class='token'><b>"+(p.baseToken?.symbol||"UNKNOWN")+" / "+(p.quoteToken?.symbol||"")+"</b><br>"+
+  "Chain: "+p.chainId+" | DEX: "+p.dexId+"<br>"+
+  "Price: $"+price+"<br>FDV: "+fdv+" | Liquidity: "+liq+"<br>"+
+  "24h Vol: "+vol+" | 24h: "+ch+"<br>"+
+  "<a href='"+p.url+"' target='_blank'>Open chart</a></div>";
+}
+
+function updateTicker(pairs){
+  ticker.innerText=pairs.map(p=>{
+    let s=p.baseToken?.symbol||"TOKEN";
+    let c=p.priceChange?.h24?p.priceChange.h24:"0";
+    return s+" "+c+"%";
+  }).join(" • ")+" • LIVE • ";
+}
+
+function generateRoast(){
+  let r=[
+    "Professional exit liquidity detected.",
+    "This chart needs therapy.",
+    "Dev wallet is breathing heavily.",
+    "Community strong. Liquidity weak.",
+    "The candles look like a crime scene.",
+    "Liquidity is thinner than the roadmap."
+  ];
+  roast.innerText=r[Math.floor(Math.random()*r.length)];
+  addFeed("AI roast generated");
+}
+
+function shareX(){
+  let text=encodeURIComponent("RugArena live battle: "+currentBattle+" — Moon or Dead? 🚀💀");
+  window.open("https://twitter.com/intent/tweet?text="+text,"_blank");
+}
+
+setInterval(()=>{
+  let fake=[
+    "wallet entered arena",
+    "new battle detected",
+    "liquidity movement spotted",
+    "AI risk engine updated",
+    "degen vote cluster forming"
+  ];
+  addFeed(fake[Math.floor(Math.random()*fake.length)]);
+},5000);
+
+loadHot("meme");
+updateStats();
+</script>
+
+</body>
+</html>
