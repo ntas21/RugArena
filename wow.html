@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RugArena WOW</title>
+
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;
+  background:#030304;
+  color:#f4f4f4;
+  font-family:Arial,Helvetica,sans-serif;
+  overflow-x:hidden;
+}
+body:before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    linear-gradient(rgba(255,255,255,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(255,255,255,.025) 1px,transparent 1px),
+    radial-gradient(circle at 20% 30%,rgba(0,255,136,.18),transparent 30%),
+    radial-gradient(circle at 80% 20%,rgba(255,47,95,.22),transparent 32%);
+  background-size:48px 48px,48px 48px,auto,auto;
+  z-index:-3;
+}
+body:after{
+  content:"";
+  position:fixed;
+  width:520px;
+  height:520px;
+  left:-160px;
+  top:25%;
+  background:radial-gradient(circle,rgba(0,255,136,.35),transparent 70%);
+  filter:blur(70px);
+  animation:float 8s ease-in-out infinite alternate;
+  z-index:-2;
+}
+@keyframes float{
+  from{transform:translateY(0)}
+  to{transform:translateY(90px)}
+}
+.header{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  z-index:20;
+  padding:18px 22px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  background:rgba(3,3,4,.66);
+  backdrop-filter:blur(18px);
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.brand{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  font-size:24px;
+  font-weight:900;
+}
+.logo{
+  width:38px;
+  height:38px;
+  border-radius:12px;
+  background:linear-gradient(135deg,#00ff88,#ff2f5f);
+  box-shadow:0 0 30px rgba(0,255,136,.4);
+}
+.badge{
+  border:1px solid rgba(255,255,255,.24);
+  border-radius:999px;
+  padding:10px 18px;
+  letter-spacing:4px;
+  font-size:13px;
+  color:#d8d8d8;
+}
+.ticker{
+  position:fixed;
+  top:75px;
+  left:0;
+  right:0;
+  z-index:19;
+  overflow:hidden;
+  white-space:nowrap;
+  background:rgba(0,20,10,.8);
+  color:#77ffb4;
+  border-bottom:1px solid rgba(0,255,136,.22);
+  font-family:monospace;
+}
+.ticker span{
+  display:inline-block;
+  padding:10px 0;
+  animation:ticker 22s linear infinite;
+}
+@keyframes ticker{
+  from{transform:translateX(100%)}
+  to{transform:translateX(-100%)}
+}
+.hero{
+  min-height:100vh;
+  padding:150px 24px 50px;
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  justify-content:center;
+}
+.hero:after{
+  content:"RUGARENA";
+  position:absolute;
+  bottom:22px;
+  left:12px;
+  font-size:88px;
+  font-weight:900;
+  letter-spacing:10px;
+  color:rgba(255,255,255,.035);
+  pointer-events:none;
+}
+.kicker{
+  display:inline-block;
+  width:max-content;
+  border:1px solid rgba(0,255,136,.28);
+  color:#a7ffcf;
+  padding:10px 14px;
+  margin-bottom:38px;
+  font-family:monospace;
+  letter-spacing:5px;
+  background:rgba(0,255,136,.05);
+}
+h1{
+  font-size:64px;
+  line-height:.92;
+  margin:0;
+  max-width:820px;
+  letter-spacing:-3px;
+}
+.red{color:#ff2f5f}
+.green{color:#00ff88}
+.sub{
+  max-width:720px;
+  color:#c8ceca;
+  font-size:21px;
+  line-height:1.55;
+  margin-top:28px;
+}
+.actions{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  margin-top:36px;
+}
+button{
+  border:none;
+  border-radius:18px;
+  padding:16px 24px;
+  font-size:17px;
+  font-weight:900;
+  cursor:pointer;
+}
+.primary{background:#f3f3f3;color:#050505}
+.secondary{
+  background:rgba(255,255,255,.04);
+  color:white;
+  border:1px solid rgba(255,255,255,.28);
+}
+.section{
+  max-width:980px;
+  margin:auto;
+  padding:38px 18px;
+}
+.terminal{
+  background:rgba(10,12,14,.88);
+  border:1px solid rgba(255,47,95,.32);
+  border-radius:34px;
+  padding:24px;
+  box-shadow:
+    0 0 45px rgba(255,47,95,.18),
+    0 0 90px rgba(0,255,136,.12);
+  backdrop-filter:blur(18px);
+}
+.battleTitle{
+  text-align:center;
+  font-size:42px;
+  margin:10px 0 24px;
+}
+.row{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  flex-wrap:wrap;
+}
+.box{
+  min-width:125px;
+  padding:16px;
+  text-align:center;
+  background:rgba(255,255,255,.04);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:20px;
+}
+.bar{
+  height:18px;
+  border-radius:999px;
+  overflow:hidden;
+  background:#2a2b31;
+  margin:24px 0;
+}
+.fill{
+  width:0%;
+  height:100%;
+  background:linear-gradient(90deg,#00ff88,#ff2f5f);
+  transition:width .5s ease;
+}
+.moon{background:#00ff88;color:#000}
+.dead{background:#ff2f5f;color:white}
+.result{
+  text-align:center;
+  color:#00ff88;
+  font-size:30px;
+  font-weight:900;
+  margin-top:20px;
+}
+.ai{
+  color:#adb5b0;
+  text-align:center;
+  font-style:italic;
+  margin-top:18px;
+}
+.panel{
+  background:rgba(12,14,16,.86);
+  border:1px solid rgba(255,255,255,.1);
+  border-radius:28px;
+  padding:22px;
+  margin:20px 0;
+  backdrop-filter:blur(14px);
+}
+input{
+  width:100%;
+  padding:16px;
+  border:none;
+  border-radius:16px;
+  margin:8px 0;
+  font-size:16px;
+}
+.feed{
+  background:#000;
+  color:#00ff88;
+  font-family:monospace;
+  border-radius:22px;
+  padding:18px;
+  line-height:1.8;
+  max-height:230px;
+  overflow:auto;
+  border:1px solid rgba(0,255,136,.18);
+}
+.token{
+  border-bottom:1px solid rgba(255,255,255,.12);
+  padding:14px 0;
+  line-height:1.7;
+  color:#dfe5e2;
+}
+.chart{
+  width:100%;
+  height:390px;
+  border:0;
+  border-radius:20px;
+  background:#000;
+}
+a{color:#00ff88}
+@media(max-width:700px){
+  h1{font-size:48px}
+  .hero:after{font-size:52px}
+  .battleTitle{font-size:34px}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="brand"><div class="logo"></div> RugArena</div>
+  <div class="badge">LIVE</div>
+</div>
+
+<div class="ticker">
+  <span id="tickerText">PEPE +12.4% • BONK -8.1% • WIF +22.7% • AI RISK ENGINE ONLINE • LIQUIDITY SCANNER ACTIVE •</span>
+</div>
+
+<section class="hero">
+  <div class="kicker">ONCHAIN DEGEN INTELLIGENCE</div>
+
+  <h1>TOKENS ENTER.<br><span class="red">ONLY SOME</span><br><span class="green">SURVIVE.</span></h1>
+
+  <div class="sub">
+    RugArena is a live crypto judgement arena. Communities vote, AI roasts, market data moves, and every token faces the same question: moon or dead?
+  </div>
+
+  <div class="actions">
+    <button class="primary" onclick="document.getElementById('arena').scrollIntoView({behavior:'smooth'})">Enter Arena</button>
+    <button class="secondary" onclick="document.getElementById('live').scrollIntoView({behavior:'smooth'})">Live Market</button>
+  </div>
+</section>
+
+<section class="section" id="arena">
+
+  <div class="terminal">
+    <div class="battleTitle" id="battleTitle">PEPE ⚔️ DOGE</div>
+
+    <div class="row">
+      <div class="box">🚀 Moon<br><span id="moonCount">0</span></div>
+      <div class="box">💀 Dead<br><span id="deadCount">0</span></div>
+      <div class="box">Total<br><span id="totalVotes">0</span></div>
+    </div>
+
+    <div class="bar"><div class="fill" id="moonBar"></div></div>
+
+    <p style="text-align:center" id="percentText">Moon 0% / Dead 0%</p>
+
+    <div class="row">
+      <button class="moon" onclick="voteMoon()">🚀 MOON</button>
+      <button class="dead" onclick="voteDead()">💀 DEAD</button>
+    </div>
+
+    <div class="result" id="resultText">Waiting for votes...</div>
+    <div class="ai" id="aiText">“AI detected maximum degen activity.”</div>
+  </div>
+
+  <div class="panel">
+    <h2>Create Battle</h2>
+    <input id="coinA" placeholder="First coin e.g. SENTINEL">
+    <input id="coinB" placeholder="Second coin e.g. FARTCOIN">
+    <button class="primary" onclick="createBattle()">⚔️ Start Battle</button>
+  </div>
+
+</section>
+
+<section class="section" id="live">
+
+  <div class="panel">
+    <h2>Live Token Data + Chart</h2>
+    <input id="searchCoin" placeholder="Token name or contract address">
+    <button class="primary" onclick="fetchDex()">🔎 Fetch DexScreener Data</button>
+    <div id="dexData" style="margin-top:18px">No token loaded.</div>
+    <br>
+    <iframe id="chartFrame" class="chart" style="display:none"></iframe>
+  </div>
+
+  <div class="panel">
+    <h2>Live Market Search</h2>
+    <div class="row">
+      <button onclick="loadHot('solana')">Solana</button>
+      <button onclick="loadHot('pump')">Pump</button>
+      <button onclick="loadHot('ai')">AI</button>
+      <button onclick="loadHot('meme')">Meme</button>
+    </div>
+    <div id="hotTokens" style="margin-top:18px">Loading live pairs...</div>
+  </div>
+
+  <div class="panel">
+    <h2>Live Activity Feed</h2>
+    <div class="feed" id="feed">
+      > booting arena protocol...<br>
+      > liquidity scanner online...<br>
+      > waiting for wallet activity...
+    </div>
+  </div>
+
+  <div class="panel">
+    <h2>AI Roast</h2>
+    <p id="roast">Waiting for degen activity...</p>
+    <button class="secondary" onclick="generateRoast()">🔥 Generate Roast</button>
+  </div>
+
+</section>
+
+<script>
+let moon=0, dead=0, currentBattle="PEPE ⚔️ DOGE";
+
+function beep(type){
+  try{
+    let ctx=new (window.AudioContext||window.webkitAudioContext)();
+    let o=ctx.createOscillator();
+    let g=ctx.createGain();
+    o.connect(g);g.connect(ctx.destination);
+    o.frequency.value=type==="moon"?760:120;
+    g.gain.value=.06;
+    o.start();
+    o.stop(ctx.currentTime+.12);
+  }catch(e){}
+}
+
+function updateStats(){
+  let total=moon+dead;
+  let mp=total===0?0:Math.round((moon/total)*100);
+  let dp=total===0?0:100-mp;
+
+  moonCount.innerText=moon;
+  deadCount.innerText=dead;
+  totalVotes.innerText=total;
+  percentText.innerText="Moon "+mp+"% / Dead "+dp+"%";
+  moonBar.style.width=mp+"%";
+
+  if(total===0) resultText.innerText="Waiting for votes...";
+  else if(moon>dead) resultText.innerText="🚀 MOON is winning";
+  else if(dead>moon) resultText.innerText="💀 DEAD is winning";
+  else resultText.innerText="⚔️ Arena is tied";
+}
+
+function addFeed(text){
+  feed.innerHTML="> "+text+"<br>"+feed.innerHTML;
+}
+
+function voteMoon(){
+  moon++;updateStats();beep("moon");
+  aiText.innerText="“Cult energy detected. This token may survive another day.”";
+  addFeed("wallet voted MOON on "+currentBattle);
+}
+
+function voteDead(){
+  dead++;updateStats();beep("dead");
+  aiText.innerText="“Exit liquidity smell is getting stronger.”";
+  addFeed("wallet voted DEAD on "+currentBattle);
+}
+
+function createBattle(){
+  let a=coinA.value||"UNKNOWN";
+  let b=coinB.value||"UNKNOWN";
+  currentBattle=a.toUpperCase()+" ⚔️ "+b.toUpperCase();
+  battleTitle.innerText=currentBattle;
+  moon=0;dead=0;updateStats();
+  addFeed("new battle detected: "+currentBattle);
+  window.scrollTo({top:0,behavior:"smooth"});
+}
+
+async function fetchDex(){
+  let q=searchCoin.value.trim();
+  if(!q){alert("Enter token name or contract address");return;}
+  dexData.innerHTML="Loading live data...";
+  addFeed("fetching DexScreener data for "+q);
+
+  try{
+    let res=await fetch("https://api.dexscreener.com/latest/dex/search?q="+encodeURIComponent(q));
+    let data=await res.json();
+
+    if(!data.pairs||data.pairs.length===0){
+      dexData.innerHTML="No token found.";
+      return;
+    }
+
+    let p=data.pairs[0];
+    dexData.innerHTML=pairHtml(p);
+    chartFrame.style.display="block";
+    chartFrame.src=p.url+"?embed=1&theme=dark";
+    addFeed((p.baseToken?.symbol||"TOKEN")+" chart loaded");
+  }catch(e){
+    dexData.innerHTML="API error.";
+  }
+}
+
+async function loadHot(q){
+  try{
+    let res=await fetch("https://api.dexscreener.com/latest/dex/search?q="+encodeURIComponent(q));
+    let data=await res.json();
+    if(!data.pairs){hotTokens.innerHTML="No pairs found.";return;}
+
+    let pairs=data.pairs.slice(0,6);
+    hotTokens.innerHTML=pairs.map(pairHtml).join("");
+    tickerText.innerText=pairs.map(p=>{
+      let s=p.baseToken?.symbol||"TOKEN";
+      let c=p.priceChange?.h24||"0";
+      return s+" "+c+"%";
+    }).join(" • ")+" • AI RISK ENGINE ONLINE •";
+
+    addFeed("live market search loaded: "+q);
+  }catch(e){
+    hotTokens.innerHTML="API error.";
+  }
+}
+
+function pairHtml(p){
+  let price=p.priceUsd||"N/A";
+  let fdv=p.fdv?"$"+Number(p.fdv).toLocaleString():"N/A";
+  let liq=p.liquidity?.usd?"$"+Number(p.liquidity.usd).toLocaleString():"N/A";
+  let vol=p.volume?.h24?"$"+Number(p.volume.h24).toLocaleString():"N/A";
+  let ch=p.priceChange?.h24?p.priceChange.h24+"%":"N/A";
+
+  return "<div class='token'><b>"+(p.baseToken?.symbol||"UNKNOWN")+" / "+(p.quoteToken?.symbol||"")+"</b><br>"+
+  "Chain: "+p.chainId+" | DEX: "+p.dexId+"<br>"+
+  "Price: $"+price+"<br>FDV: "+fdv+" | Liquidity: "+liq+"<br>"+
+  "24h Vol: "+vol+" | 24h: "+ch+"<br>"+
+  "<a href='"+p.url+"' target='_blank'>Open chart</a></div>";
+}
+
+function generateRoast(){
+  let r=[
+    "Professional exit liquidity detected.",
+    "This chart needs therapy.",
+    "Dev wallet is breathing heavily.",
+    "Community strong. Liquidity weak.",
+    "The candles look like a crime scene.",
+    "Liquidity is thinner than the roadmap."
+  ];
+  roast.innerText=r[Math.floor(Math.random()*r.length)];
+  addFeed("AI roast generated");
+}
+
+setInterval(()=>{
+  let fake=[
+    "wallet entered arena",
+    "new battle detected",
+    "liquidity movement spotted",
+    "AI risk engine updated",
+    "degen vote cluster forming"
+  ];
+  addFeed(fake[Math.floor(Math.random()*fake.length)]);
+},5500);
+
+loadHot("meme");
+updateStats();
+</script>
+
+</body>
+</html>
