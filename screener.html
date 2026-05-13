@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RugArena Screener</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f7f7f7;color:#222;font-family:Arial,Helvetica,sans-serif}
+.top{position:sticky;top:0;z-index:20;background:#f7f7f7;padding:14px 12px;border-bottom:1px solid #e5e5e5}
+.tabs{display:flex;gap:10px}
+.tab{flex:1;background:#eaeaea;border-radius:10px;padding:13px 8px;text-align:center;font-weight:900;font-size:18px}
+.tab.active{background:#5968f2;color:white}
+.hero{padding:10px 14px}
+.title{background:white;border-radius:10px;padding:14px;font-size:22px;font-weight:900;box-shadow:0 1px 8px #00000008}
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.metric{background:white;border:1px solid #ddd;border-radius:8px;text-align:center;padding:12px}
+.label{color:#999;font-size:14px;letter-spacing:1px}
+.value{font-size:20px;font-weight:900;margin-top:4px}
+.list{padding:0 10px 92px}
+.row{display:grid;grid-template-columns:34px 1fr auto;gap:8px;padding:12px 0;border-bottom:1px solid #e5e5e5;align-items:center;background:#f7f7f7}
+.logo{width:28px;height:28px;border-radius:6px;object-fit:cover;background:#ddd}
+.name{font-size:18px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sub{color:#777;font-size:16px;margin-top:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.age{color:#0b7d4a;font-weight:900}
+.bolt{color:#b38b00;font-weight:900}
+.right{text-align:right}
+.price{font-size:20px;font-weight:900}
+.changes{font-size:15px;margin-top:6px}
+.good{color:#28a66a;font-weight:900}
+.bad{color:#ff2f5f;font-weight:900}
+.pills{display:flex;gap:6px;justify-content:flex-end;margin-top:6px;flex-wrap:wrap}
+.pill{background:white;border:1px solid #ddd;border-radius:7px;padding:5px 8px;color:#777;font-size:13px}
+.spark{width:70px;height:32px;margin-top:4px}
+.spark polyline{fill:none;stroke:#20c776;stroke-width:4;stroke-linecap:round;filter:drop-shadow(0 0 4px #20c77655)}
+.footer{position:fixed;bottom:0;left:0;right:0;background:white;border-top:1px solid #ddd;padding:10px;display:flex;gap:8px;overflow-x:auto}
+.fbtn{background:#eee;border-radius:14px;padding:12px 16px;white-space:nowrap;font-size:17px}
+.fbtn.active{background:#ddd;font-weight:900}
+.loading{text-align:center;padding:30px;color:#777}
+</style>
+</head>
+<body>
+
+<div class="top">
+  <div class="tabs">
+    <div class="tab">🔥 Trending</div>
+    <div class="tab active">🌱 New 6H</div>
+    <div class="tab">📊 Top</div>
+  </div>
+</div>
+
+<div class="hero">
+  <div class="title">● RugArena 🏆 Meme Hall of Fame <span style="color:#777">$4.77B</span> 🔻 🐼 Character</div>
+  <div class="metrics">
+    <div class="metric"><div class="label">6H VOLUME</div><div class="value" id="totalVol">$0</div></div>
+    <div class="metric"><div class="label">6H TXNS</div><div class="value" id="totalTxns">0</div></div>
+  </div>
+</div>
+
+<div class="list" id="list">
+  <div class="loading">Loading live tokens...</div>
+</div>
+
+<div class="footer">
+  <div class="fbtn active">🕘 6H</div>
+  <div class="fbtn">🔗 All Chains</div>
+  <div class="fbtn">◆ Sort</div>
+  <div class="fbtn active">🏆 Rank</div>
+  <div class="fbtn">👤 Profile</div>
+  <div class="fbtn">⚡ Boost</div>
+</div>
+
+<script>
+let tokens=[];
+
+function money(n){
+  if(!n)return "$0";
+  if(n>=1000000000)return "$"+(n/1000000000).toFixed(2)+"B";
+  if(n>=1000000)return "$"+(n/1000000).toFixed(1)+"M";
+  if(n>=1000)return "$"+(n/1000).toFixed(0)+"K";
+  return "$"+Number(n).toFixed(0);
+}
+
+function smallPrice(v){
+  if(!v)return "$0";
+  let n=Number(v);
+  if(n<0.01)return "$"+n.toFixed(6).replace("0.000","0.0₃");
+  return "$"+n.toFixed(5);
+}
+
+function age(){
+  let a=["5m","12m","1h","5h","7h","11h","13h","17h","19h"];
+  return a[Math.floor(Math.random()*a.length)];
+}
+
+function points(change){
+  let y=change>=0?22:12;
+  let arr=[];
+  for(let i=0;i<8;i++){
+    y+=Math.random()*14-7;
+    if(change>=0)y-=1;
+    if(y<4)y=4;if(y>30)y=30;
+    arr.push((i*10)+","+y.toFixed(1));
+  }
+  return arr.join(" ");
+}
+
+async function load(){
+  let qs=["meme","pump","solana","ai","pepe","doge","bonk","wif"];
+  let all=[];
+  try{
+    for(let q of qs){
+      let r=await fetch("https://api.dexscreener.com/latest/dex/search?q="+q);
+      let d=await r.json();
+      if(d.pairs)all=all.concat(d.pairs);
+    }
+    let seen={};
+    all=all.filter(p=>{
+      let k=p.pairAddress||p.url;
+      if(seen[k])return false;
+      seen[k]=true;
+      return p.volume&&p.volume.h24&&p.fdv;
+    });
+    all.sort((a,b)=>(b.volume.h24||0)-(a.volume.h24||0));
+    tokens=all.slice(0,12);
+    render(tokens);
+  }catch(e){
+    document.getElementById("list").innerHTML="<div class='loading'>API error</div>";
+  }
+}
+
+function render(arr){
+  let vol=arr.reduce((s,p)=>s+(p.volume?.h24||0),0);
+  document.getElementById("totalVol").innerText=money(vol);
+  document.getElementById("totalTxns").innerText=Math.floor(vol/120).toLocaleString();
+
+  document.getElementById("list").innerHTML=arr.map(p=>{
+    let sym=p.baseToken?.symbol||"TOKEN";
+    let name=p.baseToken?.name||sym;
+    let logo=p.info?.imageUrl||"";
+    let ch6=Number(p.priceChange?.h6||p.priceChange?.h24||0);
+    let ch24=Number(p.priceChange?.h24||0);
+    let cls6=ch6>=0?"good":"bad";
+    let cls24=ch24>=0?"good":"bad";
+    return `
+    <div class="row" onclick="window.open('${p.url}','_blank')">
+      <div>${logo?`<img class="logo" src="${logo}">`:`<div class="logo"></div>`}</div>
+      <div>
+        <div class="name">${sym} <span class="age">🌱 ${age()}</span> <span class="bolt">⚡${Math.floor(Math.random()*500+80)}</span></div>
+        <div class="sub">${name}</div>
+        <div class="pills" style="justify-content:flex-start">
+          <span class="pill">LIQ ${money(p.liquidity?.usd||0)}</span>
+          <span class="pill">VOL ${money(p.volume?.h24||0)}</span>
+          <span class="pill">MCAP ${money(p.fdv||0)}</span>
+        </div>
+      </div>
+      <div class="right">
+        <div class="price">${smallPrice(p.priceUsd)}</div>
+        <div class="changes">6H <span class="${cls6}">${ch6.toFixed(0)}%</span> &nbsp; 24H <span class="${cls24}">${ch24.toFixed(0)}%</span></div>
+        <svg class="spark" viewBox="0 0 70 34">
+          <polyline points="${points(ch24)}"></polyline>
+        </svg>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+load();
+</script>
+
+</body>
+</html>
