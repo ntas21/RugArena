@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WhaleRadar</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#050607;
+  color:#f2f2f2;
+  font-family:Arial,Helvetica,sans-serif;
+}
+
+.header{
+  position:sticky;
+  top:0;
+  z-index:20;
+  background:#050607ee;
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid #ffffff12;
+  padding:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.brand{
+  font-size:28px;
+  font-weight:900;
+}
+
+.live{
+  color:#00ff88;
+  font-weight:900;
+  letter-spacing:3px;
+}
+
+.hero{
+  padding:22px 18px;
+}
+
+.hero h1{
+  margin:0;
+  font-size:42px;
+  line-height:1;
+}
+
+.green{color:#00ff88}
+.red{color:#ff2f5f}
+
+.sub{
+  margin-top:14px;
+  color:#aeb5b2;
+  font-size:17px;
+}
+
+.stats{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  padding:0 18px 12px;
+}
+
+.stat{
+  background:#101317;
+  border:1px solid #ffffff10;
+  border-radius:18px;
+  padding:14px;
+}
+
+.label{
+  color:#8f9692;
+  font-size:12px;
+  letter-spacing:1px;
+}
+
+.value{
+  margin-top:8px;
+  font-size:22px;
+  font-weight:900;
+}
+
+.feed{
+  padding:0 14px 90px;
+}
+
+.card{
+  background:#0f1216;
+  border:1px solid #ffffff10;
+  border-radius:22px;
+  padding:16px;
+  margin:14px 0;
+  box-shadow:0 0 24px rgba(0,255,136,.06);
+  animation:fade .5s ease;
+}
+
+@keyframes fade{
+  from{opacity:0;transform:translateY(10px)}
+  to{opacity:1;transform:translateY(0)}
+}
+
+.top{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.token{
+  font-size:24px;
+  font-weight:900;
+}
+
+.buy{
+  color:#00ff88;
+}
+
+.sell{
+  color:#ff2f5f;
+}
+
+.wallet{
+  margin-top:8px;
+  color:#9ca5a1;
+  font-size:14px;
+}
+
+.grid{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:10px;
+  margin-top:14px;
+}
+
+.box{
+  background:#171b21;
+  border:1px solid #ffffff10;
+  border-radius:14px;
+  padding:10px;
+}
+
+.boxlabel{
+  color:#7f8884;
+  font-size:11px;
+}
+
+.boxvalue{
+  margin-top:5px;
+  font-size:17px;
+  font-weight:900;
+}
+
+.ai{
+  margin-top:14px;
+  display:inline-block;
+  padding:8px 10px;
+  border-radius:999px;
+  background:#18201c;
+  border:1px solid #00ff8844;
+  color:#00ff88;
+  font-size:12px;
+  font-weight:900;
+}
+
+.bar{
+  height:12px;
+  background:#272b31;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:14px;
+}
+
+.fill{
+  height:100%;
+  background:linear-gradient(90deg,#00ff88,#00c76d);
+}
+
+.footer{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#0f1216ee;
+  backdrop-filter:blur(12px);
+  border-top:1px solid #ffffff12;
+  padding:12px 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+.scan{
+  color:#00ff88;
+  font-weight:900;
+}
+
+.refresh{
+  background:#00ff88;
+  color:black;
+  border:none;
+  border-radius:999px;
+  padding:12px 18px;
+  font-weight:900;
+}
+
+@media(max-width:650px){
+  .stats{grid-template-columns:1fr}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="brand">Whale<span class="green">Radar</span></div>
+  <div class="live">● LIVE</div>
+</div>
+
+<div class="hero">
+  <h1>Track <span class="green">whales</span> before<br>the crowd does.</h1>
+  <div class="sub">
+    Live smart money tracking, wallet alerts, liquidity spikes and AI momentum signals across meme coins.
+  </div>
+</div>
+
+<div class="stats">
+  <div class="stat">
+    <div class="label">LIVE BUYS</div>
+    <div class="value green" id="buys">0</div>
+  </div>
+  <div class="stat">
+    <div class="label">WHALES TRACKED</div>
+    <div class="value" id="wallets">0</div>
+  </div>
+  <div class="stat">
+    <div class="label">24H VOLUME</div>
+    <div class="value" id="volume">$0</div>
+  </div>
+</div>
+
+<div class="feed" id="feed">
+</div>
+
+<div class="footer">
+  <div class="scan">AI SCANNER ACTIVE</div>
+  <button class="refresh" onclick="generateFeed()">Refresh</button>
+</div>
+
+<script>
+const tokens=["PEPE","BONK","WIF","DOGE","FLOKI","BRETT","GOAT","FART","MEME","PUMP"];
+const aiTags=[
+"HIGH MOMENTUM",
+"SMART MONEY",
+"RISKY ENTRY",
+"WHALE ACCUMULATION",
+"BREAKOUT WATCH",
+"LOW LIQUIDITY",
+"VOLUME SPIKE"
+];
+
+function money(n){
+  if(n>=1000000)return "$"+(n/1000000).toFixed(1)+"M";
+  if(n>=1000)return "$"+(n/1000).toFixed(1)+"K";
+  return "$"+n;
+}
+
+function rand(min,max){
+  return Math.floor(Math.random()*(max-min+1))+min;
+}
+
+function wallet(){
+  let chars="abcdef0123456789";
+  let s="0x";
+  for(let i=0;i<4;i++)s+=chars[rand(0,chars.length-1)];
+  s+="...";
+  for(let i=0;i<4;i++)s+=chars[rand(0,chars.length-1)];
+  return s;
+}
+
+function generateFeed(){
+  const feed=document.getElementById("feed");
+
+  let html="";
+
+  let totalVol=0;
+  let buyCount=0;
+
+  for(let i=0;i<12;i++){
+
+    let token=tokens[rand(0,tokens.length-1)];
+    let amount=rand(5,120);
+    let mc=rand(120,950);
+    let liq=rand(20,240);
+    let vol=rand(40,900);
+    let momentum=rand(18,95);
+    let change=rand(-12,85);
+    let buy=Math.random()>0.25;
+
+    totalVol+=vol*1000;
+    if(buy)buyCount++;
+
+    html+=`
+    <div class="card">
+
+      <div class="top">
+        <div class="token">
+          ${buy ? "🐋" : "⚠️"} ${token}
+        </div>
+
+        <div class="${buy ? "buy" : "sell"}">
+          ${buy ? "+" : "-"}$${amount}K
+        </div>
+      </div>
+
+      <div class="wallet">
+        ${wallet()} ${buy ? "entered position" : "exited liquidity"}
+      </div>
+
+      <div class="grid">
+
+        <div class="box">
+          <div class="boxlabel">MCAP</div>
+          <div class="boxvalue">${money(mc*1000)}</div>
+        </div>
+
+        <div class="box">
+          <div class="boxlabel">LIQUIDITY</div>
+          <div class="boxvalue">${money(liq*1000)}</div>
+        </div>
+
+        <div class="box">
+          <div class="boxlabel">24H VOL</div>
+          <div class="boxvalue">${money(vol*1000)}</div>
+        </div>
+
+        <div class="box">
+          <div class="boxlabel">24H</div>
+          <div class="boxvalue ${change>=0?'buy':'sell'}">
+            ${change>=0?'+':''}${change}%
+          </div>
+        </div>
+
+      </div>
+
+      <div class="ai">
+        AI: ${aiTags[rand(0,aiTags.length-1)]}
+      </div>
+
+      <div class="bar">
+        <div class="fill" style="width:${momentum}%"></div>
+      </div>
+
+    </div>
+    `;
+  }
+
+  feed.innerHTML=html;
+
+  document.getElementById("buys").innerText=buyCount;
+  document.getElementById("wallets").innerText=rand(120,420);
+  document.getElementById("volume").innerText=money(totalVol);
+}
+
+generateFeed();
+setInterval(generateFeed,12000);
+</script>
+
+</body>
+</html>
