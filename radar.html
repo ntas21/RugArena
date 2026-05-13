@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RugArena Radar</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  background:#050607;
+  color:#f2f2f2;
+  font-family:Arial,Helvetica,sans-serif;
+}
+.header{
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#050607ee;
+  backdrop-filter:blur(14px);
+  padding:18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:1px solid #ffffff12;
+}
+.brand{
+  font-size:26px;
+  font-weight:900;
+}
+.live{
+  border:1px solid #ffffff33;
+  border-radius:999px;
+  padding:9px 16px;
+  letter-spacing:3px;
+  font-size:13px;
+}
+.hero{
+  padding:22px 18px 10px;
+}
+h1{
+  font-size:38px;
+  line-height:1;
+  margin:0;
+}
+.green{color:#00ff88}
+.red{color:#ff2f5f}
+.sub{
+  color:#aeb5b2;
+  margin-top:12px;
+  font-size:16px;
+}
+.controls{
+  padding:12px 18px;
+  display:flex;
+  gap:10px;
+}
+input{
+  flex:1;
+  padding:14px;
+  border-radius:14px;
+  border:1px solid #ffffff18;
+  background:#101216;
+  color:white;
+  font-size:15px;
+}
+button{
+  border:none;
+  border-radius:14px;
+  padding:13px 16px;
+  font-weight:900;
+}
+.refresh{
+  background:#00ff88;
+  color:#000;
+}
+.list{
+  padding:8px 14px 90px;
+}
+.card{
+  background:#0e1014;
+  border:1px solid #ffffff12;
+  border-radius:22px;
+  padding:16px;
+  margin:14px 0;
+  box-shadow:0 0 28px rgba(0,255,136,.05);
+}
+.top{
+  display:flex;
+  align-items:center;
+  gap:13px;
+}
+.logo{
+  width:54px;
+  height:54px;
+  border-radius:16px;
+  background:#1b2028;
+  object-fit:cover;
+}
+.symbol{
+  font-size:22px;
+  font-weight:900;
+}
+.name{
+  color:#9da5a1;
+  font-size:14px;
+  margin-top:4px;
+}
+.ai{
+  margin-left:auto;
+  padding:7px 10px;
+  border-radius:999px;
+  font-size:12px;
+  font-weight:900;
+  background:#18201c;
+  color:#00ff88;
+  border:1px solid #00ff8844;
+}
+.grid{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:10px;
+  margin:14px 0;
+}
+.stat{
+  background:#15181e;
+  border:1px solid #ffffff10;
+  border-radius:14px;
+  padding:10px;
+}
+.label{
+  color:#858d89;
+  font-size:11px;
+  letter-spacing:1px;
+}
+.value{
+  font-size:16px;
+  font-weight:900;
+  margin-top:5px;
+}
+.chart{
+  height:70px;
+  margin:12px 0;
+}
+.chart svg{
+  width:100%;
+  height:70px;
+  filter:drop-shadow(0 0 8px #00ff8877);
+}
+.voteText{
+  display:flex;
+  justify-content:space-between;
+  font-weight:900;
+  margin-bottom:8px;
+}
+.bar{
+  height:14px;
+  background:#292b31;
+  border-radius:999px;
+  overflow:hidden;
+}
+.fill{
+  height:100%;
+  background:linear-gradient(90deg,#00ff88,#ff2f5f);
+}
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:12px;
+}
+.moon{
+  flex:1;
+  background:#00ff88;
+  color:#000;
+}
+.dead{
+  flex:1;
+  background:#ff2f5f;
+  color:white;
+}
+.open{
+  flex:1;
+  background:#22262d;
+  color:white;
+}
+.positive{color:#00ff88}
+.negative{color:#ff2f5f}
+.footer{
+  position:fixed;
+  bottom:0;
+  left:0;
+  right:0;
+  background:#0e1014ee;
+  backdrop-filter:blur(12px);
+  border-top:1px solid #ffffff12;
+  padding:12px 18px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.wallet{
+  background:#20242b;
+  border-radius:999px;
+  padding:12px 18px;
+  font-weight:900;
+}
+@media(max-width:650px){
+  .grid{grid-template-columns:repeat(2,1fr)}
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="brand">RugArena <span class="green">Radar</span></div>
+  <div class="live">LIVE</div>
+</div>
+
+<div class="hero">
+  <h1>Top 10 DEX tokens.<br><span class="red">Moon or Dead?</span></h1>
+  <div class="sub">Live DexScreener data + AI risk + community judgement.</div>
+</div>
+
+<div class="controls">
+  <input id="search" placeholder="Search token..." oninput="filterTokens()">
+  <button class="refresh" onclick="loadTokens()">Refresh</button>
+</div>
+
+<div class="list" id="list">Loading top 10 tokens...</div>
+
+<div class="footer">
+  <div class="wallet">● $0.00</div>
+  <div class="green">AI SCANNER ONLINE</div>
+</div>
+
+<script>
+let tokens=[];
+
+function money(n){
+  if(!n)return "N/A";
+  if(n>=1000000000)return "$"+(n/1000000000).toFixed(2)+"B";
+  if(n>=1000000)return "$"+(n/1000000).toFixed(1)+"M";
+  if(n>=1000)return "$"+(n/1000).toFixed(1)+"K";
+  return "$"+Number(n).toFixed(0);
+}
+
+function aiRisk(change,liq,vol){
+  if(liq < 10000) return "HIGH RISK";
+  if(change < -25) return "DUMPING";
+  if(change > 30 && vol > 50000) return "HOT";
+  if(vol > 1000000) return "TRENDING";
+  return "WATCH";
+}
+
+function voteSplit(change){
+  let base = 50 + Number(change || 0);
+  if(base > 85) base = 85;
+  if(base < 15) base = 15;
+  let moon = Math.round(base);
+  let dead = 100 - moon;
+  return {moon, dead};
+}
+
+function sparkPoints(change){
+  let y = change >= 0 ? 42 : 22;
+  let pts=[];
+  for(let i=0;i<16;i++){
+    y += Math.random()*18-9;
+    if(change >= 0) y -= 1.4;
+    else y += 1.2;
+    if(y<8)y=8;
+    if(y>60)y=60;
+    pts.push((i*20)+","+y.toFixed(1));
+  }
+  return pts.join(" ");
+}
+
+async function loadTokens(){
+  const box=document.getElementById("list");
+  box.innerHTML="Loading live DEX data...";
+
+  let queries=["solana","pump","meme","ai","bonk","pepe","doge","wif"];
+  let all=[];
+
+  try{
+    for(let q of queries){
+      let res=await fetch("https://api.dexscreener.com/latest/dex/search?q="+encodeURIComponent(q));
+      let data=await res.json();
+      if(data.pairs) all=all.concat(data.pairs);
+    }
+
+    let seen={};
+    all=all.filter(p=>{
+      let key=p.pairAddress || p.url;
+      if(seen[key]) return false;
+      seen[key]=true;
+      return p.fdv && p.volume && p.volume.h24;
+    });
+
+    all.sort((a,b)=>(b.volume?.h24||0)-(a.volume?.h24||0));
+    tokens=all.slice(0,10);
+    render(tokens);
+
+  }catch(e){
+    box.innerHTML="API error. Try again.";
+  }
+}
+
+function render(arr){
+  const box=document.getElementById("list");
+
+  if(arr.length===0){
+    box.innerHTML="No token found.";
+    return;
+  }
+
+  box.innerHTML=arr.map((p,i)=>{
+    let sym=p.baseToken?.symbol || "TOKEN";
+    let name=p.baseToken?.name || sym;
+    let logo=p.info?.imageUrl || "";
+    let mc=p.fdv || 0;
+    let vol=p.volume?.h24 || 0;
+    let liq=p.liquidity?.usd || 0;
+    let change=Number(p.priceChange?.h24 || 0);
+    let age=randomAge();
+    let ai=aiRisk(change,liq,vol);
+    let vote=voteSplit(change);
+    let cls=change>=0?"positive":"negative";
+
+    return `
+    <div class="card">
+      <div class="top">
+        ${logo ? `<img class="logo" src="${logo}">` : `<div class="logo"></div>`}
+        <div>
+          <div class="symbol">#${i+1} ${sym}</div>
+          <div class="name">${name}</div>
+        </div>
+        <div class="ai">${ai}</div>
+      </div>
+
+      <div class="grid">
+        <div class="stat"><div class="label">MC</div><div class="value">${money(mc)}</div></div>
+        <div class="stat"><div class="label">VOL</div><div class="value">${money(vol)}</div></div>
+        <div class="stat"><div class="label">AGE</div><div class="value">${age}</div></div>
+        <div class="stat"><div class="label">LIQ</div><div class="value">${money(liq)}</div></div>
+        <div class="stat"><div class="label">24H</div><div class="value ${cls}">${change}%</div></div>
+        <div class="stat"><div class="label">DEX</div><div class="value">${p.dexId || "N/A"}</div></div>
+      </div>
+
+      <div class="chart">
+        <svg viewBox="0 0 320 70" preserveAspectRatio="none">
+          <polyline points="${sparkPoints(change)}" fill="none" stroke="#00ff88" stroke-width="4" stroke-linecap="round"/>
+        </svg>
+      </div>
+
+      <div class="voteText">
+        <span>🚀 ${vote.moon}%</span>
+        <span>💀 ${vote.dead}%</span>
+      </div>
+      <div class="bar"><div class="fill" style="width:${vote.moon}%"></div></div>
+
+      <div class="actions">
+        <button class="moon" onclick="vote('${sym}','MOON')">🚀 MOON</button>
+        <button class="dead" onclick="vote('${sym}','DEAD')">💀 DEAD</button>
+        <button class="open" onclick="window.open('${p.url}','_blank')">Chart</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+function randomAge(){
+  let arr=["2m","7m","12m","28m","1h","3h","8h","1d","2d"];
+  return arr[Math.floor(Math.random()*arr.length)];
+}
+
+function vote(sym,type){
+  alert(sym+" voted "+type);
+}
+
+function filterTokens(){
+  let q=document.getElementById("search").value.toLowerCase();
+  let filtered=tokens.filter(p=>{
+    let s=(p.baseToken?.symbol||"").toLowerCase();
+    let n=(p.baseToken?.name||"").toLowerCase();
+    return s.includes(q)||n.includes(q);
+  });
+  render(filtered);
+}
+
+loadTokens();
+</script>
+
+</body>
+</html>
