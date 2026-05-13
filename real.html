@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RugArena Real Radar</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#060708;color:#f4f4f4;font-family:Arial,Helvetica,sans-serif}
+.header{position:sticky;top:0;z-index:20;background:#060708ee;backdrop-filter:blur(14px);padding:18px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #ffffff12}
+.brand{font-size:26px;font-weight:900}
+.green{color:#00ff88}.red{color:#ff2f5f}
+.live{letter-spacing:4px;color:#00ff88;font-weight:900}
+.hero{padding:18px}
+h1{font-size:34px;margin:0;line-height:1.05}
+.sub{color:#aeb5b2;margin-top:10px}
+.controls{display:flex;gap:10px;padding:0 18px 12px}
+button{border:none;border-radius:14px;padding:13px 16px;font-weight:900}
+.refresh{background:#00ff88;color:#000}
+.status{color:#aeb5b2;padding:0 18px 14px;font-size:14px}
+.list{padding:0 12px 90px}
+.card{background:#101317;border:1px solid #ffffff12;border-radius:22px;padding:16px;margin:14px 0;box-shadow:0 0 26px #00ff8808}
+.top{display:flex;gap:12px;align-items:center}
+.logo{width:52px;height:52px;border-radius:15px;background:#222;object-fit:cover}
+.sym{font-size:22px;font-weight:900}
+.name{color:#9fa7a3;font-size:14px;margin-top:4px}
+.badge{margin-left:auto;border:1px solid #00ff8855;color:#00ff88;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:900}
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin:14px 0}
+.stat{background:#171b21;border:1px solid #ffffff10;border-radius:15px;padding:11px}
+.label{color:#8b938f;font-size:11px;letter-spacing:1px}
+.value{font-size:17px;font-weight:900;margin-top:5px}
+.bar{height:13px;background:#2b2d33;border-radius:999px;overflow:hidden;margin-top:7px}
+.fill{height:100%;background:linear-gradient(90deg,#00ff88,#ff2f5f)}
+.scoreRow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:12px}
+.score{background:#0b0d10;border:1px solid #ffffff10;border-radius:16px;padding:12px}
+.big{font-size:24px;font-weight:900;margin-top:5px}
+.actions{display:flex;gap:10px;margin-top:12px}
+.open{flex:1;background:#22262d;color:white}
+.moon{flex:1;background:#00ff88;color:#000}
+.dead{flex:1;background:#ff2f5f;color:white}
+.footer{position:fixed;bottom:0;left:0;right:0;background:#101317ee;backdrop-filter:blur(12px);border-top:1px solid #ffffff12;padding:12px 18px;display:flex;justify-content:space-between;align-items:center}
+.loading{text-align:center;padding:30px;color:#999}
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="brand">RugArena <span class="green">Real</span></div>
+  <div class="live">● LIVE</div>
+</div>
+
+<div class="hero">
+  <h1>Top 10 DEX Volume<br><span class="green">Pump Chance</span> + <span class="red">Rug Risk</span></h1>
+  <div class="sub">Real DexScreener data. Scores are calculated from volume, liquidity, FDV and price action.</div>
+</div>
+
+<div class="controls">
+  <button class="refresh" onclick="loadReal()">Refresh Live Data</button>
+</div>
+
+<div class="status" id="status">Starting scanner...</div>
+<div class="list" id="list"><div class="loading">Loading live DEX data...</div></div>
+
+<div class="footer">
+  <div class="green">AI SCORE ENGINE</div>
+  <div id="updated">--:--</div>
+</div>
+
+<script>
+let allPairs=[];
+
+function money(n){
+  if(!n)return "N/A";
+  if(n>=1000000000)return "$"+(n/1000000000).toFixed(2)+"B";
+  if(n>=1000000)return "$"+(n/1000000).toFixed(1)+"M";
+  if(n>=1000)return "$"+(n/1000).toFixed(1)+"K";
+  return "$"+Number(n).toFixed(0);
+}
+
+function clamp(n,min,max){return Math.max(min,Math.min(max,n));}
+
+function scores(p){
+  let vol=Number(p.volume?.h24||0);
+  let liq=Number(p.liquidity?.usd||0);
+  let fdv=Number(p.fdv||0);
+  let ch=Number(p.priceChange?.h24||0);
+
+  let volScore=clamp(vol/50000,0,35);
+  let liqScore=clamp(liq/25000,0,25);
+  let momentum=clamp(ch, -40, 40);
+  let mcBonus=fdv>0 && fdv<1000000 ? 15 : fdv<10000000 ? 8 : 2;
+
+  let pump=Math.round(clamp(30+volScore+liqScore+(momentum/2)+mcBonus,5,95));
+
+  let rug=20;
+  if(liq<10000)rug+=35;
+  if(liq<50000)rug+=15;
+  if(ch<-25)rug+=20;
+  if(fdv>0 && liq/fdv<0.03)rug+=20;
+  if(vol>0 && liq>0 && vol/liq>8)rug+=10;
+  rug=Math.round(clamp(rug,5,95));
+
+  let smart=Math.round(clamp((volScore*1.4)+(liqScore*1.2)+Math.max(ch,0)/2+mcBonus,0,100));
+
+  return {pump,rug,smart};
+}
+
+function tag(sc){
+  if(sc.rug>70)return "HIGH RUG";
+  if(sc.pump>75)return "PUMP WATCH";
+  if(sc.smart>65)return "SMART MONEY";
+  return "WATCH";
+}
+
+async function loadReal(){
+  const list=document.getElementById("list");
+  const status=document.getElementById("status");
+  list.innerHTML="<div class='loading'>Scanning DEX volume...</div>";
+  status.innerText="Fetching live DexScreener data...";
+
+  let queries=["solana","pump","meme","ai","pepe","doge","bonk","wif","base","eth"];
+  let merged=[];
+
+  try{
+    for(let q of queries){
+      let res=await fetch("https://api.dexscreener.com/latest/dex/search?q="+encodeURIComponent(q));
+      let data=await res.json();
+      if(data.pairs)merged=merged.concat(data.pairs);
+    }
+
+    let seen={};
+    merged=merged.filter(p=>{
+      let key=p.pairAddress||p.url;
+      if(seen[key])return false;
+      seen[key]=true;
+      return p.volume && p.volume.h24 && p.fdv && p.liquidity && p.liquidity.usd;
+    });
+
+    merged.sort((a,b)=>(b.volume?.h24||0)-(a.volume?.h24||0));
+    allPairs=merged.slice(0,10);
+    render(allPairs);
+
+    status.innerText="LIVE • Top 10 by 24h DEX volume";
+    document.getElementById("updated").innerText=new Date().toLocaleTimeString();
+
+  }catch(e){
+    list.innerHTML="<div class='loading'>API error. Try again.</div>";
+    status.innerText="API error";
+  }
+}
+
+function render(arr){
+  const list=document.getElementById("list");
+
+  list.innerHTML=arr.map((p,i)=>{
+    let sym=p.baseToken?.symbol||"TOKEN";
+    let name=p.baseToken?.name||sym;
+    let logo=p.info?.imageUrl||"";
+    let ch=Number(p.priceChange?.h24||0);
+    let sc=scores(p);
+    let t=tag(sc);
+
+    return `
+    <div class="card">
+      <div class="top">
+        ${logo?`<img class="logo" src="${logo}">`:`<div class="logo"></div>`}
+        <div>
+          <div class="sym">#${i+1} ${sym}</div>
+          <div class="name">${name} • ${p.chainId} • ${p.dexId}</div>
+        </div>
+        <div class="badge">${t}</div>
+      </div>
+
+      <div class="grid">
+        <div class="stat"><div class="label">MC / FDV</div><div class="value">${money(p.fdv)}</div></div>
+        <div class="stat"><div class="label">24H VOL</div><div class="value">${money(p.volume?.h24)}</div></div>
+        <div class="stat"><div class="label">LIQUIDITY</div><div class="value">${money(p.liquidity?.usd)}</div></div>
+        <div class="stat"><div class="label">24H CHANGE</div><div class="value ${ch>=0?'green':'red'}">${ch.toFixed(2)}%</div></div>
+      </div>
+
+      <div class="scoreRow">
+        <div class="score">
+          <div class="label">PUMP CHANCE</div>
+          <div class="big green">${sc.pump}%</div>
+          <div class="bar"><div class="fill" style="width:${sc.pump}%"></div></div>
+        </div>
+
+        <div class="score">
+          <div class="label">RUG RISK</div>
+          <div class="big red">${sc.rug}%</div>
+          <div class="bar"><div class="fill" style="width:${sc.rug}%"></div></div>
+        </div>
+      </div>
+
+      <div class="score" style="margin-top:10px">
+        <div class="label">SMART MONEY SCORE</div>
+        <div class="big">${sc.smart}%</div>
+        <div class="bar"><div class="fill" style="width:${sc.smart}%"></div></div>
+      </div>
+
+      <div class="actions">
+        <button class="moon">🚀 MOON</button>
+        <button class="dead">💀 DEAD</button>
+        <button class="open" onclick="window.open('${p.url}','_blank')">Chart</button>
+      </div>
+    </div>`;
+  }).join("");
+}
+
+loadReal();
+setInterval(loadReal,30000);
+</script>
+
+</body>
+</html>
